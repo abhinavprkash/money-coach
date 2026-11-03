@@ -1,0 +1,19 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "money-coach transactions.csv row",
+ "description": "One CSV row per posted transaction. Written by ingest_csv.py / ingest_json.py.",
+ "type": "object",
+ "required": ["date", "account", "description", "amount", "category", "group", "kind"],
+ "properties": {
+  "date": {"type": "string", "format": "date"},
+  "account": {"type": "string", "description": "Account display name chosen by the user (never a full number)"},
+  "institution": {"type": "string"},
+  "description": {"type": "string", "description": "Description as exported by the bank"},
+  "merchant": {"type": "string", "description": "Cleaned merchant name"},
+  "amount": {"type": "number", "description": "Negative = money out of this account, positive = money in"},
+  "category": {"type": "string"},
+  "group": {"type": "string"},
+  "kind": {"enum": ["income", "expense", "transfer", "investment", "financing"]},
+  "source": {"type": "string", "description": "csv:<file>:<profile> or json source"}
+ }
+}

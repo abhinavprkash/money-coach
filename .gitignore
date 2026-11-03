@@ -1,0 +1,10 @@
+# Your financial data stays local. Never commit it.
+money-coach-data/
+*.xlsx
+!examples/demo/*.xlsx
+app/site/index.html
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+node_modules/

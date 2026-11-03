@@ -1,0 +1,81 @@
+{
+ "version": 1,
+ "currency": "USD",
+ "tone": "honest",
+ "plan": {"start_month": "2026-11", "months": 6},
+ "income": {
+  "frequency": "semimonthly",
+  "take_home_per_paycheck": 2850,
+  "changes": [],
+  "extra_pay": [
+   {"label": "Annual bonus (after tax)", "month": "2027-03", "amount_after_tax": 3000, "confirmed": false},
+   {"label": "Tax refund", "month": "2027-03", "amount_after_tax": 900, "confirmed": false}
+  ]
+ },
+ "split": {
+  "remainder": "Chase Checking",
+  "accounts": [
+   {"name": "Ally Savings", "kind": "savings", "per_paycheck": 400, "job": "Goal money. Never withdraw before the deadline."},
+   {"name": "Bills Checking", "kind": "bills", "per_paycheck": 1400, "job": "Rent, loans and fixed bills on autopay; leftover is the sinking fund."}
+  ],
+  "remainder_job": "Cards and daily spending. Pays every card statement in full."
+ },
+ "cards": ["Chase Sapphire", "Amex Gold"],
+ "fixed_bills": [
+  {"name": "Rent", "paid_from": "Bills Checking", "amount": 1650},
+  {"name": "Student loan", "paid_from": "Bills Checking", "amount": 420},
+  {"name": "Auto loan", "paid_from": "Bills Checking", "amount": 390},
+  {"name": "Electric", "paid_from": "Bills Checking", "amount": 85},
+  {"name": "Car insurance", "paid_from": "Bills Checking", "amount": 142},
+  {"name": "Phone", "paid_from": "Chase Sapphire", "amount": 65},
+  {"name": "Gym", "paid_from": "Amex Gold", "amount": 24.99}
+ ],
+ "subscriptions": [
+  {"name": "Netflix", "card": "Amex Gold", "amount": 15.49, "active": true},
+  {"name": "Spotify", "card": "Amex Gold", "amount": 11.99, "active": true},
+  {"name": "Hulu", "card": "Amex Gold", "amount": 9.99, "active": false},
+  {"name": "OpenAI", "card": "Amex Gold", "amount": 20, "active": true}
+ ],
+ "cap_multipliers": {"protect": 1.0, "normal": 0.85, "cut": 0.5},
+ "categories": [
+  {"name": "Groceries", "card": "Chase Sapphire", "priority": "protect", "cap": null},
+  {"name": "Gas", "card": "Chase Sapphire", "priority": "protect", "cap": null},
+  {"name": "Dining", "card": "Chase Sapphire", "priority": "normal", "cap": null},
+  {"name": "Rideshare", "card": "Chase Sapphire", "priority": "normal", "cap": null},
+  {"name": "Entertainment", "card": "Amex Gold", "priority": "normal", "cap": null},
+  {"name": "Household", "card": "Amex Gold", "priority": "normal", "cap": null},
+  {"name": "Food Delivery", "card": "Chase Sapphire", "priority": "cut", "cap": null},
+  {"name": "Online Shopping", "card": "Amex Gold", "priority": "cut", "cap": null},
+  {"name": "Coffee", "card": "Chase Sapphire", "priority": "cut", "cap": null},
+  {"name": "Clothing", "card": "Amex Gold", "priority": "cut", "cap": null}
+ ],
+ "payroll": [
+  {"label": "Your 401(k) (5%)", "monthly": 350, "counts_toward_goal": true},
+  {"label": "Employer 401(k) match", "monthly": 280, "counts_toward_goal": true}
+ ],
+ "goal": {
+  "target": 22000,
+  "deadline": "2027-04-30",
+  "counts_retirement": true,
+  "balances": [
+   {"name": "Ally Savings", "amount": 2100},
+   {"name": "Chase Checking", "amount": 900},
+   {"name": "401(k)", "amount": 6400, "retirement": true}
+  ],
+  "card_debt": 1100,
+  "sinking_unspent_pct": 0.5,
+  "expected_annual_return": 0
+ },
+ "tax": {"federal_marginal": 0.22, "state_marginal": 0.06, "payroll_tax_exempt": false, "hsa_state_taxed": false},
+ "loans": [
+  {"name": "Student loan", "kind": "student", "currency": "USD", "principal": 28000, "outstanding": 23400, "rate": 0.068,
+   "type": "Compound", "tenure_years": 10, "min_payment": 300, "current_payment": 420},
+  {"name": "Auto loan", "kind": "auto", "currency": "USD", "principal": 14200, "outstanding": 9800, "rate": 0.059,
+   "type": "Compound", "tenure_years": 5, "min_payment": 390, "current_payment": 390}
+ ],
+ "investments": [
+  {"name": "Total market index", "kind": "Index fund", "expected_return": 0.08, "risk": "Medium", "weight": 0.7},
+  {"name": "International index", "kind": "Index fund", "expected_return": 0.07, "risk": "Medium", "weight": 0.3}
+ ],
+ "lvi": {"monthly_budget": 1610, "current_investing_monthly": 800, "years": 10, "step_up": 0.03, "stress_return": 0.06, "fx": null}
+}

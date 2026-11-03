@@ -1,0 +1,15 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "money-coach",
+  "description": "money-coach: a local, private money review + budget dashboard for Claude Code",
+  "owner": { "name": "abhinavprkash", "url": "https://github.com/abhinavprkash" },
+  "plugins": [
+    {
+      "name": "money-coach",
+      "description": "Bank CSVs in, honest money review out: subagents for ingest, audit, subscriptions, spending, budget, goal and loan-vs-invest, plus a local dashboard and Excel workbook.",
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/abhinavprkash/money-coach"
+    }
+  ]
+}

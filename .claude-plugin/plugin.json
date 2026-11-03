@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "money-coach",
+  "version": "0.1.0",
+  "description": "A brutally honest money coach for Claude Code. Imports your bank CSVs (or the Cashflow MCP), audits a year of spending with one subagent per job, onboards you in the CLI, and builds a local budget dashboard + Excel workbook with a savings-goal tracker, paycheck split planner and a loan-vs-invest simulator. Your data never leaves your machine.",
+  "author": { "name": "abhinavprkash", "url": "https://github.com/abhinavprkash" },
+  "homepage": "https://github.com/abhinavprkash/money-coach",
+  "repository": "https://github.com/abhinavprkash/money-coach",
+  "license": "MIT",
+  "keywords": ["claude-code", "claude-skills", "budget", "personal-finance", "savings-goal", "loan-vs-invest", "subagents", "dashboard"]
+}

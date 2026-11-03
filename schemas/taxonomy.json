@@ -1,0 +1,502 @@
+{
+ "_about": "Starter categories for auto-categorizing bank CSVs. Users can edit this per workspace: copy it to money-coach-data/taxonomy.json and change keywords. Keywords match case-insensitively against the description/merchant. First match wins, so specific rules come first.",
+ "transfer_keywords": [
+  "payment thank you",
+  "thank you",
+  "autopay",
+  "auto pay",
+  "epayment",
+  "card payment",
+  "credit card payment",
+  "crd autopay",
+  "transfer to",
+  "transfer from",
+  "online transfer",
+  "internal transfer",
+  "xfer",
+  "ach transfer",
+  "brokerage",
+  "robinhood",
+  "fidelity",
+  "vanguard",
+  "schwab"
+ ],
+ "income_keywords": [
+  "payroll",
+  "direct dep",
+  "salary",
+  "dir dep",
+  "paycheck",
+  "interest paid",
+  "dividend",
+  "tax refund",
+  "irs treas"
+ ],
+ "p2p_keywords": [
+  "zelle",
+  "venmo",
+  "cash app",
+  "paypal transfer",
+  "apple cash"
+ ],
+ "categories": [
+  {
+   "name": "Food Delivery",
+   "group": "Food",
+   "keywords": [
+    "doordash",
+    "uber eats",
+    "ubereats",
+    "grubhub",
+    "postmates",
+    "instacart",
+    "caviar",
+    "seamless"
+   ]
+  },
+  {
+   "name": "Groceries",
+   "group": "Food",
+   "keywords": [
+    "grocery",
+    "safeway",
+    "trader joe",
+    "whole foods",
+    "kroger",
+    "costco",
+    "aldi",
+    "wegmans",
+    "publix",
+    "sprouts",
+    "h-e-b",
+    "heb ",
+    "target grocery",
+    "walmart grocery",
+    "lidl",
+    "99 ranch",
+    "patel brothers"
+   ]
+  },
+  {
+   "name": "Coffee",
+   "group": "Food",
+   "keywords": [
+    "starbucks",
+    "coffee",
+    "dunkin",
+    "peet",
+    "blue bottle",
+    "philz"
+   ]
+  },
+  {
+   "name": "Dining",
+   "group": "Food",
+   "keywords": [
+    "restaurant",
+    "cafe",
+    "grill",
+    "pizza",
+    "taco",
+    "burger",
+    "sushi",
+    "kitchen",
+    "bar ",
+    "pub",
+    "chipotle",
+    "mcdonald",
+    "subway",
+    "panera",
+    "chick-fil",
+    "wingstop",
+    "diner",
+    "bistro",
+    "eatery",
+    "tst*",
+    "sq *"
+   ]
+  },
+  {
+   "name": "Online Shopping",
+   "group": "Shopping",
+   "keywords": [
+    "amazon",
+    "amzn",
+    "ebay",
+    "etsy",
+    "temu",
+    "shein",
+    "aliexpress",
+    "walmart.com",
+    "target.com"
+   ]
+  },
+  {
+   "name": "Clothing",
+   "group": "Shopping",
+   "keywords": [
+    "nike",
+    "adidas",
+    "h&m",
+    "zara",
+    "uniqlo",
+    "gap ",
+    "old navy",
+    "nordstrom",
+    "macy",
+    "banana republic",
+    "lululemon"
+   ]
+  },
+  {
+   "name": "Electronics",
+   "group": "Shopping",
+   "keywords": [
+    "apple store",
+    "best buy",
+    "bestbuy",
+    "micro center",
+    "newegg"
+   ]
+  },
+  {
+   "name": "Household",
+   "group": "Shopping",
+   "keywords": [
+    "home depot",
+    "lowe",
+    "ikea",
+    "bed bath",
+    "target",
+    "walmart",
+    "costco whse"
+   ]
+  },
+  {
+   "name": "Gas",
+   "group": "Transportation",
+   "keywords": [
+    "shell",
+    "chevron",
+    "exxon",
+    "mobil",
+    "arco",
+    "76 ",
+    "costco gas",
+    "valero",
+    "bp ",
+    "speedway",
+    "fuel"
+   ]
+  },
+  {
+   "name": "Rideshare",
+   "group": "Transportation",
+   "keywords": [
+    "uber",
+    "lyft"
+   ]
+  },
+  {
+   "name": "Parking & Tolls",
+   "group": "Transportation",
+   "keywords": [
+    "parking",
+    "parkmobile",
+    "toll",
+    "fastrak",
+    "e-zpass",
+    "spothero"
+   ]
+  },
+  {
+   "name": "Public Transit",
+   "group": "Transportation",
+   "keywords": [
+    "transit",
+    "clipper",
+    "metro",
+    "mta",
+    "bart",
+    "caltrain",
+    "amtrak"
+   ]
+  },
+  {
+   "name": "Car Rental",
+   "group": "Travel",
+   "keywords": [
+    "rent a car",
+    "rent-a-car",
+    "hertz",
+    "avis",
+    "enterprise rent",
+    "budget rent",
+    "sixt",
+    "turo"
+   ]
+  },
+  {
+   "name": "Flights",
+   "group": "Travel",
+   "keywords": [
+    "airlines",
+    "airways",
+    "air lines",
+    "delta air",
+    "united",
+    "southwest",
+    "jetblue",
+    "alaska air",
+    "emirates",
+    "spirit air",
+    "frontier"
+   ]
+  },
+  {
+   "name": "Lodging",
+   "group": "Travel",
+   "keywords": [
+    "hotel",
+    "airbnb",
+    "marriott",
+    "hilton",
+    "hyatt",
+    "hostel",
+    "booking.com",
+    "expedia",
+    "vrbo"
+   ]
+  },
+  {
+   "name": "Subscriptions",
+   "group": "Bills",
+   "keywords": [
+    "netflix",
+    "spotify",
+    "hulu",
+    "disney",
+    "youtube",
+    "hbo",
+    "max.com",
+    "prime video",
+    "apple.com/bill",
+    "icloud",
+    "openai",
+    "chatgpt",
+    "anthropic",
+    "claude.ai",
+    "adobe",
+    "dropbox",
+    "patreon",
+    "audible",
+    "paramount",
+    "peacock",
+    "github"
+   ]
+  },
+  {
+   "name": "Phone & Internet",
+   "group": "Bills",
+   "keywords": [
+    "verizon",
+    "t-mobile",
+    "tmobile",
+    "at&t",
+    "att*",
+    "comcast",
+    "xfinity",
+    "spectrum",
+    "mint mobile",
+    "visible",
+    "google fi"
+   ]
+  },
+  {
+   "name": "Utilities",
+   "group": "Bills",
+   "keywords": [
+    "electric",
+    "pg&e",
+    "pge",
+    "edison",
+    "water",
+    "gas co",
+    "utility",
+    "utilities",
+    "con ed",
+    "duke energy"
+   ]
+  },
+  {
+   "name": "Insurance",
+   "group": "Bills",
+   "keywords": [
+    "insurance",
+    "geico",
+    "progressive",
+    "state farm",
+    "allstate",
+    "lemonade",
+    "liberty mutual"
+   ]
+  },
+  {
+   "name": "Rent & Housing",
+   "group": "Housing",
+   "keywords": [
+    "rent",
+    "apartment",
+    "property mgmt",
+    "leasing",
+    "mortgage",
+    "hoa"
+   ]
+  },
+  {
+   "name": "Loan Payment",
+   "group": "Debt",
+   "keywords": [
+    "loan",
+    "student ln",
+    "navient",
+    "nelnet",
+    "sallie mae",
+    "mohela",
+    "auto pay loan",
+    "affirm",
+    "klarna",
+    "afterpay",
+    "sunbit"
+   ]
+  },
+  {
+   "name": "Fitness",
+   "group": "Health",
+   "keywords": [
+    "gym",
+    "fitness",
+    "planet fitness",
+    "equinox",
+    "peloton",
+    "classpass",
+    "yoga",
+    "crossfit",
+    "whoop"
+   ]
+  },
+  {
+   "name": "Medical & Pharmacy",
+   "group": "Health",
+   "keywords": [
+    "pharmacy",
+    "cvs",
+    "walgreens",
+    "rite aid",
+    "medical",
+    "clinic",
+    "dental",
+    "doctor",
+    "hospital",
+    "lab corp",
+    "quest diag"
+   ]
+  },
+  {
+   "name": "Personal Care",
+   "group": "Personal",
+   "keywords": [
+    "salon",
+    "barber",
+    "spa",
+    "sephora",
+    "ulta",
+    "nail"
+   ]
+  },
+  {
+   "name": "Entertainment",
+   "group": "Entertainment",
+   "keywords": [
+    "cinema",
+    "theatre",
+    "theater",
+    "amc ",
+    "regal",
+    "ticketmaster",
+    "eventbrite",
+    "stubhub",
+    "concert",
+    "topgolf",
+    "bowling",
+    "steam",
+    "playstation",
+    "xbox",
+    "nintendo"
+   ]
+  },
+  {
+   "name": "Education",
+   "group": "Education",
+   "keywords": [
+    "university",
+    "college",
+    "tuition",
+    "coursera",
+    "udemy",
+    "school"
+   ]
+  },
+  {
+   "name": "Fees",
+   "group": "Fees",
+   "keywords": [
+    "fee",
+    "atm",
+    "overdraft",
+    "interest charge",
+    "late charge",
+    "maintenance"
+   ]
+  },
+  {
+   "name": "Gifts & Donations",
+   "group": "Giving",
+   "keywords": [
+    "donation",
+    "charity",
+    "gofundme",
+    "red cross"
+   ]
+  }
+ ],
+ "fallback": {
+  "name": "Other",
+  "group": "Other"
+ },
+ "merchant_aliases": {
+  "amazon": "Amazon",
+  "amzn": "Amazon",
+  "doordash": "DoorDash",
+  "uber eats": "Uber Eats",
+  "ubereats": "Uber Eats",
+  "uber *trip": "Uber",
+  "uber trip": "Uber",
+  "lyft": "Lyft",
+  "starbucks": "Starbucks",
+  "costco gas": "Costco Gas",
+  "costco": "Costco",
+  "trader joe": "Trader Joe's",
+  "whole foods": "Whole Foods",
+  "target": "Target",
+  "walmart": "Walmart",
+  "netflix": "Netflix",
+  "spotify": "Spotify",
+  "hulu": "Hulu",
+  "openai": "OpenAI",
+  "chatgpt": "OpenAI",
+  "apple.com/bill": "Apple",
+  "grubhub": "Grubhub",
+  "instacart": "Instacart"
+ }
+}

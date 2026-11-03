@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>money-coach</title>
+<style>
+  :root { --navy:#1f3864; --hdr:#d9e1f2; --input:#fff9db; --line:#d0d0d0; --red:#c00000; --redbg:#f8cbad; --greenbg:#c6efce; --muted:#6b6b6b; --total:#ededed; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.4 Arial, Helvetica, sans-serif; color: #111; background: #f4f5f7; }
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 16px; }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+  .tabs button, .tabs label { font: inherit; padding: 7px 14px; border: 1px solid var(--line); background: #fff; border-radius: 6px 6px 0 0; cursor: pointer; }
+  .tabs button.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .tabs .spacer { flex: 1; }
+  .tabs .tool { border-radius: 6px; color: var(--navy); border-color: var(--navy); }
+  h1 { color: var(--navy); font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); font-style: italic; font-size: 12px; margin: 2px 0 12px; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 1000px) { .cols { grid-template-columns: 1fr; } }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 12px; }
+  .sec { background: var(--navy); color: #fff; font-weight: bold; padding: 5px 8px; margin: 14px 0 0; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; }
+  .sec:first-child { margin-top: 0; }
+  .sec a { color: #fff; text-decoration: none; border: 1px solid #fff8; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: var(--hdr); color: var(--navy); font-size: 11px; text-align: left; padding: 4px 6px; border: 1px solid var(--line); }
+  td { padding: 3px 6px; border: 1px solid var(--line); vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.total td { background: var(--total); font-weight: bold; }
+  td.roast, .roast { color: var(--red); font-style: italic; font-size: 11.5px; }
+  td.info, .info { color: var(--muted); font-style: italic; font-size: 11.5px; }
+  input, select { font: inherit; border: 1px solid #c9c9c9; background: var(--input); color: #0000ff; padding: 2px 4px; border-radius: 3px; width: 100%; }
+  input.num { text-align: right; max-width: 100px; }
+  .neg { background: var(--redbg); } .pos { background: var(--greenbg); }
+  .hero { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  @media (max-width: 800px) { .hero { grid-template-columns: 1fr 1fr; } }
+  .hero div { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+  .hero b { display: block; font-size: 20px; color: var(--navy); }
+  .hero span { color: var(--muted); font-size: 11.5px; }
+  .roastbar { background: #fff3f3; border: 1px solid #f1b9b9; color: var(--red); padding: 8px 10px; border-radius: 6px; margin-bottom: 12px; font-weight: bold; }
+  .note { background: #fff8e1; border: 1px solid #f0d58c; color: #7a5b00; padding: 8px 10px; border-radius: 6px; margin-bottom: 12px; }
+  .ok { background: #eef6ee; border: 1px solid #a8d5b0; color: #1d5e2b; padding: 8px 10px; border-radius: 6px; margin-bottom: 12px; }
+  .add { display: grid; grid-template-columns: 120px 1.4fr 1.4fr 90px 1.2fr 1fr 70px; gap: 4px; margin: 8px 0; }
+  .btn { font: inherit; background: var(--navy); color: #fff; border: 0; border-radius: 4px; padding: 4px 10px; cursor: pointer; }
+  .btn.ghost { background: #fff; color: var(--navy); border: 1px solid var(--navy); }
+  .x { background: none; border: 0; color: var(--red); cursor: pointer; font-size: 14px; }
+  .tracker { max-height: 900px; overflow: auto; } .tracker td { white-space: nowrap; } .tracker td.info { white-space: normal; min-width: 140px; }
+  .tracker select { min-width: 150px; font-size: 12px; }
+  .bar { height: 14px; background: #e5e7eb; border-radius: 7px; overflow: hidden; margin: 6px 0; } .bar span { display: block; height: 100%; background: var(--navy); }
+  .flag { border: 1px solid var(--line); border-radius: 6px; padding: 10px; margin-bottom: 8px; background: #fff; }
+  .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 1px 8px; border-radius: 10px; border: 1px solid var(--line); margin-right: 6px; }
+  .rules li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="tabs" id="tabs"></div><div id="view"></div></div>
+<script>
+const PLAN = /*__PLAN__*/null;
+const STORE = "money-coach-v1";
+const money = v => (v < 0 ? "-$" : "$") + Math.abs(+v || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const m0 = v => "$" + Math.round(Math.abs(v)).toLocaleString("en-US");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const $ = id => document.getElementById(id);
+const CATS = [...PLAN.fixed.map(f => f.name), ...PLAN.categories.map(c => c.name), ...PLAN.extraCats];
+const KIND = Object.fromEntries(PLAN.split.accounts.map(a => [a.name, a.kind || "spending"]));
+const help = k => PLAN.docs[k] ? `<a href="${PLAN.docs[k]}" target="_blank" title="How to fill this in">?</a>` : "";
+
+// ---------- state ----------
+function freshMonth(m) {
+  return {
+    per_paycheck: m.per_paycheck, extra: m.extra.map(e => e.amount),
+    split: Object.fromEntries(PLAN.split.accounts.map(a => [a.name, +a.per_paycheck])),
+    fixed: Object.fromEntries(PLAN.fixed.map(f => [f.name, m.fixed_active.includes(f.name) ? f.amount : 0])),
+    subs: Object.fromEntries(PLAN.subs.map(s => [s.name, { cost: s.amount, active: s.active && m.subs_active.includes(s.name) ? "Yes" : "No" }])),
+    variable: Object.fromEntries(PLAN.categories.map(c => [c.name, c.cap])),
+    saved: {}, expenses: [],
+  };
+}
+const SERVER = location.protocol.startsWith("http");
+let S = null, LV = null, saveTimer = null, saveState = "saved", note = "";
+const defaultState = () => ({ tab: PLAN.months[0].key, months: Object.fromEntries(PLAN.months.map(m => [m.key, freshMonth(m)])), goal: { actuals: {}, windfalls: {} } });
+function fillMissing(st) {
+  st.goal ||= { actuals: {}, windfalls: {} };
+  PLAN.months.forEach(m => { const b = freshMonth(m), c = st.months[m.key]; st.months[m.key] = c ? { ...b, ...c, expenses: c.expenses || [] } : b; });
+  return st;
+}
+function payload() {
+  const expenses = [], months = {};
+  Object.entries(S.months).forEach(([k, M]) => { const { expenses: ex, ...rest } = M; months[k] = rest;
+    ex.forEach(e => expenses.push({ month: k, date: e.date, desc: e.desc, cat: e.cat, amt: +e.amt || 0, card: e.card || "", notes: e.notes || "" })); });
+  return { expenses, settings: { seeded: true, version: 1, tab: S.tab, months, goal: S.goal, lvi: LV } };
+}
+async function pushNow() {
+  try { const r = await fetch("/api/state", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload()) }); saveState = r.ok ? "saved" : "error"; }
+  catch { saveState = "error"; }
+  paintStatus();
+}
+function save() {
+  if (!SERVER) { localStorage.setItem(STORE, JSON.stringify({ S, LV })); return; }
+  saveState = "saving"; paintStatus(); clearTimeout(saveTimer); saveTimer = setTimeout(pushNow, 300);
+}
+addEventListener("beforeunload", e => { if (SERVER && saveState !== "saved") { e.preventDefault(); e.returnValue = ""; } });
+async function boot() {
+  if (SERVER) {
+    try {
+      const d = await (await fetch("/api/state", { cache: "no-store" })).json();
+      if (d.settings && d.settings.seeded) {
+        S = { tab: d.settings.tab || PLAN.months[0].key, months: {}, goal: d.settings.goal };
+        Object.entries(d.settings.months || {}).forEach(([k, M]) => S.months[k] = { ...M, expenses: [] });
+        d.expenses.forEach(e => { (S.months[e.month] ||= { expenses: [] }).expenses ||= []; S.months[e.month].expenses.push(e); });
+        fillMissing(S); LV = d.settings.lvi || null; return;
+      }
+      S = defaultState(); await pushNow(); return;
+    } catch { saveState = "error"; }
+  }
+  const saved = JSON.parse(localStorage.getItem(STORE) || "null");
+  S = fillMissing(saved ? saved.S : defaultState()); LV = saved ? saved.LV : null;
+}
+function paintStatus() {
+  const el = $("savestate"); if (!el) return;
+  el.innerHTML = !SERVER ? `<span style="color:var(--red)">⚠ Browser only</span>` : saveState === "saved" ? `<span style="color:#0a7a2f">✓ Saved</span>`
+    : saveState === "saving" ? `<span class="info">Saving…</span>` : `<span style="color:var(--red)">✕ Save failed: is the server running?</span>`;
+}
+
+// ---------- budget math (mirrors scripts/mc_common.month_budget) ----------
+function calc(key) {
+  const m = PLAN.months.find(x => x.key === key), M = S.months[key];
+  const spent = c => M.expenses.filter(e => e.cat === c).reduce((s, e) => s + (+e.amt || 0), 0);
+  const extra = M.extra.reduce((s, v) => s + (+v || 0), 0), income = M.per_paycheck * m.paychecks + extra;
+  const firstSav = PLAN.split.accounts.find(a => a.kind === "savings");
+  const splitM = Object.fromEntries(PLAN.split.accounts.map(a => [a.name, M.split[a.name] * m.paychecks]));
+  m.extra.forEach((e, i) => { const dest = e.route_to || (firstSav ? firstSav.name : PLAN.split.remainder); splitM[dest] = (splitM[dest] || 0) + (+M.extra[i] || 0); });
+  const remM = income - Object.values(splitM).reduce((s, v) => s + v, 0);
+  const remPer = M.per_paycheck - Object.values(M.split).reduce((s, v) => s + v, 0);
+  const fixedB = Object.values(M.fixed).reduce((s, v) => s + (+v || 0), 0), fixedA = PLAN.fixed.reduce((s, f) => s + spent(f.name), 0);
+  const subsB = Object.values(M.subs).reduce((s, x) => s + (x.active === "Yes" ? +x.cost : 0), 0), subsA = spent("Subscriptions");
+  const savings = Object.entries(splitM).filter(([n]) => KIND[n] === "savings").reduce((s, [, v]) => s + v, 0);
+  const bills = Object.keys(KIND).filter(n => KIND[n] === "bills");
+  const sinking = Math.max(0, bills.reduce((s, n) => s + splitM[n], 0) - PLAN.fixed.filter(f => bills.includes(f.paid_from)).reduce((s, f) => s + (+M.fixed[f.name] || 0), 0));
+  const savA = Object.values(M.saved || {}).reduce((s, v) => s + (+v || 0), 0);
+  const varB = Object.values(M.variable).reduce((s, v) => s + (+v || 0), 0), varA = PLAN.categories.reduce((s, c) => s + spent(c.name), 0);
+  const outB = fixedB + subsB + savings + sinking + varB, outA = fixedA + subsA + savA + varA;
+  const supports = M.per_paycheck - (fixedB + subsB + varB + sinking) / m.paychecks;
+  const savSlice = PLAN.split.accounts.filter(a => a.kind === "savings").reduce((s, a) => s + M.split[a.name], 0);
+  return { m, M, spent, extra, income, splitM, remM, remPer, fixedB, fixedA, subsB, subsA, savings, sinking, savA, varB, varA, outB, outA, netB: income - outB, supports, savSlice };
+}
+
+// ---------- roasts (tone + priority aware; mirrors scripts/roast.py) ----------
+const voice = p => p === "protect" ? "gentle" : (p === "cut" && PLAN.tone !== "gentle" ? "savage" : PLAN.tone);
+function varRoast(b, a, base, p) {
+  const v = voice(p);
+  if (b === 0) return a > 0 ? ({ gentle: "You planned $0 here.", honest: `Budget was $0; you spent ${m0(a)}.`, savage: `Budget was $0 and you spent ${m0(a)}. Explain yourself.` })[v] : (base || "Clean.");
+  if (a > b) return ({ gentle: `${m0(a - b)} over. Tomorrow's a new day.`, honest: `Over by ${m0(a - b)}. Pause this category.`, savage: `OVER by ${m0(a - b)}. Card goes in the drawer.` })[v];
+  if (a >= 0.8 * b) return "80%+ used. Slow down.";
+  return base || "On track.";
+}
+const netRoast = n => n < 0 ? "Budget is in DEFICIT. Savings are not an ATM. Cut something now." : n < 50 ? `Razor thin: ${m0(n)}. Zero impulse buys.` : `Planned buffer ${m0(n)}. Leftover goes to savings at month end.`;
+function headline(c) {
+  const cut = PLAN.categories.filter(x => x.priority === "cut" && c.spent(x.name) > (+c.M.variable[x.name] || 0));
+  const over = PLAN.categories.filter(x => c.M.variable[x.name] > 0 && c.spent(x.name) > c.M.variable[x.name]);
+  if (c.remPer < 0) return "🚨 Your direct-deposit split is bigger than your paycheck. Fix the split.";
+  if (c.savSlice - c.supports > 50) return `🚨 Savings split is ${m0(c.savSlice - c.supports)}/paycheck more than the budget leaves. You'll end up withdrawing it.`;
+  if (cut.length) return `🔥 Over in categories you said you'd cut: ${cut.map(x => x.name).join(", ")}.`;
+  if (over.length) return `🔥 Over budget in: ${over.map(x => x.name).join(", ")}.`;
+  if (c.netB < 50) return "😬 Almost no buffer this month. Zero impulse buys.";
+  return "👀 So far so good. Still watching.";
+}
+
+// ---------- views ----------
+const numIn = (path, v) => `<input class="num" type="number" step="0.01" data-p="${esc(path)}" value="${v}">`;
+const row = cells => `<tr>${cells.join("")}</tr>`;
+function tabs() {
+  const t = (k, l) => `<button data-t="${esc(k)}" class="${S.tab === k ? "on" : ""}">${l}</button>`;
+  $("tabs").innerHTML = PLAN.months.map(m => t(m.key, m.label)).join("") + t("goal", "🎯 Goal") + t("flags", `🚩 Findings (${PLAN.findings.length})`)
+    + (PLAN.lvi ? t("lvi", "📊 Loan vs Invest") : "") + `<span class="spacer"></span><span id="savestate" style="margin-right:8px;font-size:12px"></span>`
+    + (SERVER ? `<button class="tool" id="xl">Update Excel</button>` : "")
+    + `<button class="tool" id="bk">Download backup</button><label class="tool">Import backup<input type="file" id="imp" accept=".json" style="display:none"></label>`;
+  document.querySelectorAll("[data-t]").forEach(b => b.onclick = () => { S.tab = b.dataset.t; save(); render(); });
+  paintStatus();
+  $("bk").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify({ kind: "money-coach-backup", S, LV }, null, 1)], { type: "application/json" })); a.download = `money-coach-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click(); };
+  $("imp").onchange = e => e.target.files[0] && e.target.files[0].text().then(t => { const b = JSON.parse(t); if (b.kind !== "money-coach-backup") { note = "That file isn't a money-coach backup."; } else { S = fillMissing(b.S); LV = b.LV; note = "Backup imported."; save(); } render(); });
+  if ($("xl")) $("xl").onclick = async () => { $("xl").textContent = "Building…"; try { const r = await (await fetch("/api/export-excel", { method: "POST" })).json(); note = r.ok ? `Excel updated: ${r.path}` : `Excel build failed: ${r.error}`; } catch { note = "Excel build failed."; } render(); };
+}
+
+function monthView(key) {
+  const c = calc(key), M = c.M, m = c.m;
+  let h = `<h1>${esc(m.label)} Budget</h1><p class="sub">Yellow = you type. Everything else updates itself. Red italics = the roast. Click ? on any section for how to fill it in.</p>
+  <div class="hero"><div><span>Income this month</span><b>${money(c.income)}</b><span>${m.extra.map(e => esc(e.label)).join(", ") || "No extra pay planned"}</span></div>
+  <div><span>To savings</span><b>${money(c.savings)}</b><span>Never withdraw before your goal date</span></div>
+  <div><span>Spent so far</span><b>${money(c.fixedA + c.subsA + c.varA)}</b><span>of ${money(c.fixedB + c.subsB + c.varB)} budgeted</span></div>
+  <div><span>Planned buffer</span><b>${money(c.netB)}</b><span>${esc(netRoast(c.netB))}</span></div></div>
+  <div class="roastbar">${esc(headline(c))}</div>`;
+  let L = `<div class="sec">INCOME & BANK ALLOCATION ${help("income")}</div><table><tr><th>Description</th><th class="n">Amount</th><th>Notes</th></tr>
+    ${row([`<td>Take-home per paycheck</td>`, `<td class="n">${numIn("per_paycheck", M.per_paycheck)}</td>`, `<td class="info">${m.paychecks.toFixed(2)} paychecks this month</td>`])}
+    ${m.extra.map((e, i) => row([`<td>${esc(e.label)}${e.confirmed ? "" : " <span class='info'>(unconfirmed)</span>"}</td>`, `<td class="n">${numIn("extra." + i, M.extra[i])}</td>`, `<td class="info">Goes straight to savings</td>`])).join("")}
+    <tr class="total"><td>TOTAL INCOME</td><td class="n">${money(c.income)}</td><td></td></tr></table>
+    <div class="sec">PAYCHECK SPLIT ${help("split")}</div><table><tr><th>Account</th><th>Job</th><th class="n">Per paycheck</th><th class="n">Monthly</th></tr>
+    ${PLAN.split.accounts.map(a => row([`<td>${esc(a.name)}</td>`, `<td class="info">${esc(a.job || a.kind)}</td>`, `<td class="n">${numIn("split." + a.name, M.split[a.name])}</td>`, `<td class="n">${money(c.splitM[a.name])}</td>`])).join("")}
+    ${row([`<td>${esc(PLAN.split.remainder)}</td>`, `<td class="info">${esc(PLAN.split.remainder_job || "Gets the rest")}</td>`, `<td class="n ${c.remPer < 0 ? "neg" : ""}">${money(c.remPer)}</td>`, `<td class="n">${money(c.remM)}</td>`])}
+    </table><p class="${c.savSlice - c.supports > 50 ? "roast" : "info"}">Budget supports ${money(c.supports)}/paycheck for savings; your split sends ${money(c.savSlice)}. ${c.savSlice - c.supports > 50 ? "Lower the savings slice or cut caps, or you'll pull it back out." : "✓ Fits."}</p>`;
+  L += `<div class="sec">FIXED & RECURRING ${help("fixed")}</div><table><tr><th>Expense</th><th>Paid from</th><th class="n">Budgeted</th><th class="n">Actual</th><th class="n">Diff</th><th>Notes</th></tr>
+    ${PLAN.fixed.map(f => { const a = c.spent(f.name), d = M.fixed[f.name] - a; return row([`<td>${esc(f.name)}</td>`, `<td>${esc(f.paid_from)}</td>`, `<td class="n">${numIn("fixed." + f.name, M.fixed[f.name])}</td>`, `<td class="n">${money(a)}</td>`, `<td class="n ${d < 0 ? "neg" : ""}">${money(d)}</td>`, `<td class="roast">${esc(m.fixed_active.includes(f.name) ? f.roast : "Not active this month")}</td>`]); }).join("")}
+    <tr class="total"><td>TOTAL FIXED</td><td></td><td class="n">${money(c.fixedB)}</td><td class="n">${money(c.fixedA)}</td><td class="n">${money(c.fixedB - c.fixedA)}</td><td></td></tr></table>`;
+  L += `<div class="sec">SUBSCRIPTIONS ${help("subs")}</div><table><tr><th>Service</th><th class="n">Cost</th><th>Active?</th><th class="n">Actual</th><th>Roast</th></tr>
+    ${PLAN.subs.map(s => { const x = M.subs[s.name], act = M.expenses.filter(e => e.cat === "Subscriptions" && e.desc === s.name).reduce((t, e) => t + (+e.amt || 0), 0);
+      return row([`<td>${esc(s.name)}</td>`, `<td class="n">${numIn("subs." + s.name + ".cost", x.cost)}</td>`, `<td><select data-p="${esc("subs." + s.name + ".active")}"><option ${x.active === "Yes" ? "selected" : ""}>Yes</option><option ${x.active === "No" ? "selected" : ""}>No</option></select></td>`,
+        `<td class="n">${money(act)}</td>`, `<td class="roast">${esc(x.active === "No" && act > 0 ? `Marked No and STILL charged ${money(act)}. Cancel it for real.` : s.roast)}</td>`]); }).join("")}
+    <tr class="total"><td>TOTAL (active)</td><td class="n">${money(c.subsB)}</td><td></td><td class="n">${money(c.subsA)}</td><td></td></tr></table>`;
+  L += `<div class="sec">SAVINGS ${help("goal")}</div><table><tr><th>Where</th><th class="n">Budgeted</th><th class="n">Actual (you confirm)</th><th>Roast</th></tr>
+    ${PLAN.split.accounts.filter(a => a.kind === "savings").map(a => { const v = +(M.saved[a.name] || 0); return row([`<td>${esc(a.name)}</td>`, `<td class="n">${money(c.splitM[a.name])}</td>`, `<td class="n">${numIn("saved." + a.name, v)}</td>`, `<td class="roast">${v === 0 ? "Still $0. Did the split happen?" : v < c.splitM[a.name] ? "Less than planned. Fix the split." : "Saved on plan. Respect."}</td>`]); }).join("")}
+    ${row([`<td>Sinking fund (left in bills accounts)</td>`, `<td class="n">${money(c.sinking)}</td>`, `<td class="n">${numIn("saved.sinking", +(M.saved.sinking || 0))}</td>`, `<td class="roast">Repairs, travel, annual bills only.</td>`])}
+    </table>${PLAN.payroll.length ? `<p class="info">Already out of your paycheck: ${PLAN.payroll.map(p => `${esc(p.label)} ${money(p.monthly)}`).join(" · ")}</p>` : ""}`;
+  L += `<div class="sec">VARIABLE SPENDING ${help("variable")}</div><table><tr><th>Category</th><th>Priority</th><th class="n">Cap</th><th class="n">Spent</th><th class="n">Left</th><th>Status / Roast</th></tr>
+    ${PLAN.categories.map(x => { const b = +M.variable[x.name], a = c.spent(x.name), d = b - a; return row([`<td>${esc(x.name)}</td>`, `<td class="info">${esc(x.priority || "normal")}</td>`, `<td class="n">${numIn("variable." + x.name, b)}</td>`, `<td class="n">${money(a)}</td>`, `<td class="n ${d < 0 ? "neg" : ""}">${money(d)}</td>`, `<td class="roast">${esc(varRoast(b, a, x.roast, x.priority))}</td>`]); }).join("")}
+    <tr class="total"><td>TOTAL VARIABLE</td><td></td><td class="n">${money(c.varB)}</td><td class="n">${money(c.varA)}</td><td class="n">${money(c.varB - c.varA)}</td><td></td></tr></table>`;
+  L += `<div class="sec">MONTHLY SUMMARY</div><table><tr><th>Category</th><th class="n">Budgeted</th><th class="n">Actual</th></tr>
+    ${[["Income", c.income, c.income], ["Fixed", c.fixedB, c.fixedA], ["Subscriptions", c.subsB, c.subsA], ["Savings + sinking", c.savings + c.sinking, c.savA], ["Variable", c.varB, c.varA]].map(([l, b, a]) => row([`<td>${l}</td>`, `<td class="n">${money(b)}</td>`, `<td class="n">${money(a)}</td>`])).join("")}
+    <tr class="total"><td>NET REMAINING</td><td class="n ${c.netB < 0 ? "neg" : "pos"}">${money(c.netB)}</td><td class="n">${money(c.income - c.outA)}</td></tr></table>
+    <div class="sec">CARD SPENDING ${help("cards")}</div><table>${PLAN.cards.map(cd => row([`<td>${esc(cd)}</td>`, `<td class="n">${money(M.expenses.filter(e => e.card === cd).reduce((s, e) => s + (+e.amt || 0), 0))}</td>`])).join("")}
+    ${row([`<td class="info">No card picked</td>`, `<td class="n">${money(M.expenses.filter(e => !e.card).reduce((s, e) => s + (+e.amt || 0), 0))}</td>`])}</table>
+    <p class="roast">Pay every statement IN FULL. Card interest erases everything on this page.</p>`;
+  const opts = (list, sel) => `<option value=""></option>` + list.map(x => `<option ${x === sel ? "selected" : ""}>${esc(x)}</option>`).join("");
+  const R = `<div class="sec">${esc(m.name.toUpperCase())} EXPENSE TRACKER</div>
+    <div class="add"><input type="date" id="a-date" value="${new Date().toISOString().slice(0, 10)}"><input id="a-desc" placeholder="Description">
+    <select id="a-cat">${opts(CATS)}</select><input id="a-amt" class="num" type="number" step="0.01" placeholder="0.00"><select id="a-card">${opts(PLAN.cards)}</select>
+    <input id="a-notes" placeholder="Notes"><button class="btn" id="a-add">Add</button></div>
+    <div class="tracker"><table><tr><th>#</th><th>Date</th><th>Description</th><th>Category</th><th class="n">Amount</th><th>Card</th><th>Notes</th><th></th></tr>
+    ${M.expenses.map((e, i) => row([`<td>${i + 1}</td>`, `<td>${esc((e.date || "").slice(5).replace("-", "/"))}</td>`, `<td>${esc(e.desc)}</td>`, `<td><select data-e="${i}.cat">${opts(CATS, e.cat)}</select></td>`,
+      `<td class="n">${money(e.amt)}</td>`, `<td><select data-e="${i}.card">${opts(PLAN.cards, e.card)}</select></td>`, `<td class="info">${esc(e.notes)}</td>`, `<td><button class="x" data-del="${i}">✕</button></td>`])).join("")
+      || `<tr><td colspan="8" class="info">Nothing logged yet. Example: 03/14 · Corner Grocery · Groceries · 42.10 · ${esc(PLAN.cards[0] || "your card")}</td></tr>`}</table></div>`;
+  $("view").innerHTML = h + `<div class="cols"><div class="panel">${L}</div><div class="panel">${R}</div></div>`;
+  document.querySelectorAll("[data-p]").forEach(el => el.onchange = () => {
+    const p = el.dataset.p, v = el.tagName === "SELECT" ? el.value : (+el.value || 0), [top, ...rest] = p.split(".");
+    if (top === "subs") { const last = rest.pop(); M.subs[rest.join(".")][last] = v; }
+    else if (rest.length === 0) M[top] = v; else if (top === "extra") M.extra[+rest[0]] = v; else { (M[top] ||= {})[rest.join(".")] = v; }
+    save(); render();
+  });
+  document.querySelectorAll("[data-e]").forEach(s => s.onchange = () => { const [i, f] = s.dataset.e.split("."); M.expenses[+i][f] = s.value; save(); render(); });
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { M.expenses.splice(+b.dataset.del, 1); save(); render(); });
+  $("a-add").onclick = () => { const amt = +$("a-amt").value, cat = $("a-cat").value; if (!amt || !cat) { $("a-amt").focus(); return; }
+    M.expenses.push({ date: $("a-date").value, desc: $("a-desc").value, cat, amt, card: $("a-card").value, notes: $("a-notes").value }); save(); render(); $("a-desc").focus(); };
+  $("a-amt").onkeydown = e => { if (e.key === "Enter") $("a-add").click(); };
+}
+
+function goalView() {
+  const g = PLAN.goal, A = S.goal.actuals, pts = [...(g.start != null ? [{ label: "Start", plan_balance: g.start }] : []), ...g.checkpoints];
+  const latest = [...pts].reverse().find(p => A[p.label] !== undefined && A[p.label] !== "");
+  const have = latest ? +A[latest.label] : (g.start || 0);
+  const roast = (plan, a) => a === undefined || a === "" ? "Fill this in at month end." : a >= g.target ? "Target HIT." : a - plan >= 0 ? `Ahead by ${m0(a - plan)}. Don't celebrate with shopping.` : `Behind by ${m0(plan - a)}. Check the split and the caps.`;
+  $("view").innerHTML = `<h1>Road to ${m0(g.target)} by ${esc(g.deadline)}</h1><p class="sub">Plan from the goal-planner: projected ${g.projected != null ? m0(g.projected) : "?"}. Enter your real total at each month end. ${help("goal")}</p>
+  <div class="panel"><b>${money(have)}</b> of ${money(g.target)}<div class="bar"><span style="width:${Math.max(0, Math.min(100, have / g.target * 100)).toFixed(1)}%"></span></div></div>
+  <div class="cols" style="margin-top:12px"><div class="panel"><div class="sec">CHECKPOINTS</div><table><tr><th>Checkpoint</th><th class="n">Plan</th><th class="n">Your actual</th><th class="n">Ahead / behind</th><th>Roast</th></tr>
+  ${pts.map(p => { const a = A[p.label]; const d = a === undefined || a === "" ? null : a - p.plan_balance;
+    return `<tr><td>${esc(p.label)}</td><td class="n">${money(p.plan_balance)}</td><td class="n"><input class="num" type="number" step="0.01" data-g="${esc(p.label)}" value="${a ?? ""}"></td><td class="n ${d == null ? "" : d < 0 ? "neg" : "pos"}">${d == null ? "" : money(d)}</td><td class="roast">${esc(roast(p.plan_balance, a))}</td></tr>`; }).join("")}
+  </table></div><div class="panel"><div class="sec">WINDFALLS: 100% TO SAVINGS</div><table><tr><th>Windfall</th><th class="n">Estimate</th><th>Arrived?</th><th>Moved?</th><th>Roast</th></tr>
+  ${PLAN.windfalls.map(w => { const st = S.goal.windfalls[w.label] || {}, yn = k => `<select data-w="${esc(w.label)}" data-k="${k}"><option></option><option ${st[k] === "Yes" ? "selected" : ""}>Yes</option><option ${st[k] === "No" ? "selected" : ""}>No</option></select>`;
+    return `<tr><td>${esc(w.label)} <span class="info">${esc(w.month)}</span></td><td class="n">${money(w.amount)}</td><td>${yn("arrived")}</td><td>${yn("moved")}</td><td class="roast">${st.arrived !== "Yes" ? "Not here yet." : st.moved === "Yes" ? "Moved the same day." : "It arrived and it's NOT in savings? Move it now."}</td></tr>`; }).join("") || `<tr><td colspan="5" class="info">No windfalls planned.</td></tr>`}
+  </table></div></div>`;
+  document.querySelectorAll("[data-g]").forEach(i => i.onchange = () => { S.goal.actuals[i.dataset.g] = i.value === "" ? "" : +i.value; save(); render(); });
+  document.querySelectorAll("[data-w]").forEach(s => s.onchange = () => { (S.goal.windfalls[s.dataset.w] ||= {})[s.dataset.k] = s.value; save(); render(); });
+}
+
+function flagsView() {
+  const col = { critical: "#d03b3b", serious: "#ec835a", warning: "#fab219", verify: "#fab219", opp: "#0ca30c", good: "#0ca30c" };
+  $("view").innerHTML = `<h1>Findings</h1><p class="sub">From each subagent: ingest, audit, recurring, spending, budget, goal, loan-vs-invest. Ranked by severity, then money at stake.</p>
+  ${PLAN.findings.map(f => `<div class="flag"><span class="badge" style="border-color:${col[f.severity] || "#999"}">${esc(f.severity)}</span><b>${esc(f.title)}</b>
+    <span class="info" style="float:right">${esc(f.agent)}${f.amount_at_stake ? ` · ${money(f.amount_at_stake)} at stake` : ""}</span>
+    <ul class="info">${(f.evidence || []).map(e => `<li>${esc(e)}</li>`).join("")}</ul><div><b>Do:</b> ${esc(f.action)}</div></div>`).join("") || `<p class="info">No findings yet. Run /money-review.</p>`}`;
+}
+
+/*__LVI_CODE__*/
+function render() {
+  tabs();
+  S.tab === "goal" ? goalView() : S.tab === "flags" ? flagsView() : S.tab === "lvi" && PLAN.lvi ? lviView() : monthView(PLAN.months.some(m => m.key === S.tab) ? S.tab : (S.tab = PLAN.months[0].key));
+  const banner = (!SERVER ? `<div class="note">Opened as a file, so changes save only in this browser. Run <b>/money-dashboard</b> (or <code>python3 app/server.py</code>) to save to files.</div>` : "") + (note ? `<div class="ok">${esc(note)}</div>` : "");
+  if (banner) $("view").insertAdjacentHTML("afterbegin", banner);
+  note = "";
+}
+boot().then(render);
+</script>
+</body>
+</html>

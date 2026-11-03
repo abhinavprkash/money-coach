@@ -1,0 +1,27 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "money-coach findings file",
+ "description": "money-coach-data/findings/<agent>.json - one per subagent. The dashboard renders these on the Findings tab.",
+ "type": "object",
+ "required": ["agent", "findings"],
+ "properties": {
+  "agent": {"type": "string"},
+  "as_of": {"type": "string", "format": "date"},
+  "findings": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": ["severity", "title", "amount_at_stake", "evidence", "action"],
+    "properties": {
+     "severity": {"enum": ["critical", "serious", "warning", "verify", "opp", "good"]},
+     "title": {"type": "string", "description": "One line with the user's own number in it"},
+     "amount_at_stake": {"type": "number", "description": "Dollars affected (annualized or to the deadline - say which in evidence)"},
+     "evidence": {"type": "array", "items": {"type": "string"}},
+     "action": {"type": "string"},
+     "lever": {"enum": ["caps", "split", "subs", "goal", "lvi"]},
+     "category": {"type": "string"}
+    }
+   }
+  }
+ }
+}

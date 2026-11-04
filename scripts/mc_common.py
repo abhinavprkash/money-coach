@@ -35,6 +35,23 @@ def ensure_dir(p):
     return p
 
 
+def secure_tree(ddir):
+    """Owner-only permissions for everything in the data folder (dirs 700, files 600).
+    Run after any step that may have created files another way (e.g. an agent's Write/Edit tool)."""
+    ddir = Path(ddir)
+    if not ddir.exists():
+        return 0
+    fixed = 0
+    for p in [ddir, *ddir.rglob("*")]:
+        if p.is_symlink():
+            continue
+        want = 0o700 if p.is_dir() else 0o600
+        if (p.stat().st_mode & 0o777) != want:
+            os.chmod(p, want)
+            fixed += 1
+    return fixed
+
+
 def write_private(path, text):
     path = Path(path)
     ensure_dir(path.parent)

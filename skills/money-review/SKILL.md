@@ -21,6 +21,7 @@ You coordinate. **The subagents do the analysis; you do the talking.** Subagents
 - Tell the user, once: everything stays on this machine; nothing is uploaded; no money moves.
 - If `$WORKSPACE` is inside a git repo, check that `money-coach-data/` is gitignored. If it isn't, offer to add it.
 - Agents are dispatched with the Agent tool as `subagent_type: "money-coach:<agent-name>"`. **Every prompt includes `PLUGIN_ROOT=<abs path>` and `WORKSPACE=<abs path>`** plus only the files that agent needs.
+- After each agent step, run `python3 $PLUGIN_ROOT/scripts/findings_tool.py check --workspace $WORKSPACE` as a backstop. It validates the findings and resets permissions to owner-only. If it reports problems, send them back to that agent once.
 
 ## 1. Ingest (agent: data-ingest)
 - Ask where the statements are if no path was given. Suggest exporting 12 months of CSVs from each bank/card into `$WORKSPACE/statements/`.

@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from mc_common import KINDS, PLUGIN_ROOT, data_dir, read_json, read_transactions, write_json, write_transactions  # noqa: E402
+from mc_common import KINDS, PLUGIN_ROOT, data_dir, read_json, read_transactions, secure_tree, write_json, write_transactions  # noqa: E402
 from ingest_csv import ALIASES, Categorizer, clean_merchant, parse_date  # noqa: E402
 
 GROUP_KIND = {"Income": "income", "Transfers": "transfer", "Investment": "investment", "Financing": "financing", "Debt": "financing"}
@@ -63,6 +63,7 @@ def main(argv=None):
     rep = {"written": str(target), "rows": len(out), "source": a.source,
            "range": [min(r["date"] for r in out), max(r["date"] for r in out)] if out else None}
     write_json(ddir / "findings" / "ingest.json", rep)
+    secure_tree(ddir)
     print(json.dumps(rep, indent=1))
 
 

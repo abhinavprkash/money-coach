@@ -14,8 +14,9 @@ const ddir = path.basename(ws) === "money-coach-data" ? ws : path.join(ws, "mone
 const cfg = JSON.parse(fs.readFileSync(path.join(ddir, "config.json"), "utf8"));
 if (!(cfg.loans || []).length) {
   const out = { agent: "lvi", skipped: "No loans in config.json (onboarding said none), so there's nothing to compare.", findings: [] };
-  fs.mkdirSync(path.join(ddir, "findings"), { recursive: true });
+  fs.mkdirSync(path.join(ddir, "findings"), { recursive: true, mode: 0o700 });
   fs.writeFileSync(path.join(ddir, "findings", "lvi.json"), JSON.stringify(out, null, 1), { mode: 0o600 });
+  fs.chmodSync(path.join(ddir, "findings", "lvi.json"), 0o600);
   console.log(out.skipped); process.exit(0);
 }
 for (const k of ["monthly_budget", "years"]) if (!(cfg.lvi || {})[k]) { console.error(`config.lvi.${k} is missing (see docs/onboarding/loans.md)`); process.exit(2); }
@@ -48,6 +49,7 @@ if (process.argv.includes("--stress") && cfg.lvi.stress_return != null) {
   out.stress = { stress_return: +cfg.lvi.stress_return, best: st.best, results: st.results };
 }
 base.red_pen.forEach(n => out.findings.push({ severity: n.sev, title: n.text.split(". ")[0], amount_at_stake: 0, evidence: [n.text], action: "See the red pen in the Loan vs Invest tab.", lever: "lvi" }));
-fs.mkdirSync(path.join(ddir, "findings"), { recursive: true });
+fs.mkdirSync(path.join(ddir, "findings"), { recursive: true, mode: 0o700 });
 fs.writeFileSync(path.join(ddir, "findings", "lvi.json"), JSON.stringify(out, null, 1), { mode: 0o600 });
+fs.chmodSync(path.join(ddir, "findings", "lvi.json"), 0o600);
 console.log(JSON.stringify({ best: out.best, results: out.results.map(r => [r.id, r.monthly, r.net_worth_y5, r.net_worth_end]), stress: out.stress && out.stress.results.map(r => [r.id, r.net_worth_end]), red_pen: out.red_pen.length }, null, 1));

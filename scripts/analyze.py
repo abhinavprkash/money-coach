@@ -19,7 +19,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from mc_common import data_dir, month_add, read_json, read_transactions, write_json  # noqa: E402
+from mc_common import data_dir, month_add, read_json, read_transactions, secure_tree, write_json  # noqa: E402
 import roast as R  # noqa: E402
 
 SEVERITY_ORDER = {"critical": 0, "serious": 1, "warning": 2, "verify": 3, "opp": 4, "good": 5}
@@ -268,6 +268,7 @@ def main(argv=None):
     else:
         f, lines = spending(rows, an, cfg)
         doc = write_findings(ddir, "spending", f, {"roasts": lines})
+    secure_tree(ddir)
     print(json.dumps({"agent": doc["agent"], "findings": [f"[{x['severity']}] {x['title']}" for x in doc["findings"]]}, indent=1))
 
 

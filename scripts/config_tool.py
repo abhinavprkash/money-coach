@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from mc_common import ConfigError, data_dir, ensure_dir, read_json, validate_config, write_json  # noqa: E402
+from mc_common import ConfigError, data_dir, ensure_dir, read_json, secure_tree, validate_config, write_json  # noqa: E402
 
 SKELETON = {
     "version": 1, "currency": "USD", "tone": None,
@@ -66,6 +66,18 @@ def recap(c):
 
 
 def main(argv=None):
+    try:
+        _main(argv)
+    finally:
+        secure_tree(data_dir(_ws(argv)))
+
+
+def _ws(argv):
+    args = list(argv if argv is not None else sys.argv[1:])
+    return args[args.index("--workspace") + 1] if "--workspace" in args else None
+
+
+def _main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["init", "set", "append", "get", "missing", "recap"])
     ap.add_argument("key", nargs="?")

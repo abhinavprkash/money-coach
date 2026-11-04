@@ -16,7 +16,7 @@ from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from mc_common import data_dir, load_config, month_budget, month_label, plan_months, write_json  # noqa: E402
+from mc_common import data_dir, load_config, month_budget, month_label, plan_months, secure_tree, write_json  # noqa: E402
 
 
 def project(cfg):
@@ -70,6 +70,7 @@ def main(argv=None):
     res = project(load_config(ddir))
     res.update({"agent": "goal", "as_of": date.today().isoformat()})
     write_json(ddir / "findings" / "goal.json", res)
+    secure_tree(ddir)
     print(json.dumps({k: res[k] for k in ("start", "projected", "target", "gap", "checkpoints")}, indent=1))
 
 

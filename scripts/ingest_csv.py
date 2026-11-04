@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from mc_common import PLUGIN_ROOT, data_dir, read_json, read_transactions, write_json, write_transactions  # noqa: E402
+from mc_common import PLUGIN_ROOT, data_dir, read_json, read_transactions, secure_tree, write_json, write_transactions  # noqa: E402
 
 # header signature (lowercased, subset) -> how to read it. sign: +1 means file uses negative = outflow.
 PROFILES = {
@@ -204,6 +204,7 @@ def main(argv=None):
                    "uncategorized": sum(1 for r in dedup if r["category"] in ("Other",)),
                    "by_kind": {k: sum(1 for r in dedup if r["kind"] == k) for k in ("income", "expense", "transfer", "financing", "investment")}})
     write_json(ddir / "findings" / "ingest.json", report)
+    secure_tree(ddir)
     print(json.dumps(report, indent=1))
 
 

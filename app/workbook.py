@@ -360,6 +360,7 @@ def build(ddir, cfg, plan, expenses, settings):
     wb.calculation.fullCalcOnLoad = True
     out = Path(ddir) / "output" / "Budget.xlsx"
     out.parent.mkdir(parents=True, exist_ok=True)
+    os.chmod(out.parent, 0o700)
     wb.save(out)
     os.chmod(out, 0o600)
     return out

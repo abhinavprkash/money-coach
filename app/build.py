@@ -18,7 +18,7 @@ APP = Path(__file__).resolve().parent
 ROOT = APP.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 from mc_common import (ConfigError, active, data_dir, ensure_dir, load_config, month_label, month_name,  # noqa: E402
-                       plan_months, ppm, read_json, take_home)
+                       plan_months, ppm, read_json, secure_tree, take_home)
 import roast as R  # noqa: E402
 
 DOCS = {"income": "income.md", "split": "bank-split.md", "fixed": "fixed-bills.md", "subs": "subscriptions.md",
@@ -118,6 +118,9 @@ def main(argv=None):
     if not a.no_excel:
         import workbook
         print("wrote", workbook.build(ddir, cfg, plan, *load_saved(ddir)))
+    fixed = secure_tree(ddir)
+    if fixed:
+        print(f"tightened permissions on {fixed} file(s)/folder(s) to owner-only")
 
 
 if __name__ == "__main__":

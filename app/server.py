@@ -65,6 +65,7 @@ def backup_once_today(path):
     if not path.exists():
         return
     BACKUPS.mkdir(parents=True, exist_ok=True)
+    os.chmod(BACKUPS, 0o700)
     target = BACKUPS / f"{path.stem}-{date.today().isoformat()}{path.suffix}"
     if not target.exists():
         shutil.copy2(path, target)
@@ -196,6 +197,9 @@ def main():
     configure(a.workspace, a.port)
     if not (SITE / "index.html").exists():
         sys.exit(f"{SITE / 'index.html'} is missing. Build it first: python3 {APP / 'build.py'} --workspace {a.workspace}")
+    sys.path.insert(0, str(APP.parent / "scripts"))
+    from mc_common import secure_tree
+    secure_tree(DATA)
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     url = f"http://localhost:{PORT}/"
     print(f"money-coach running at {url}  (data: {DATA})\nPress Ctrl+C to stop.")

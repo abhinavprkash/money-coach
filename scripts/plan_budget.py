@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from mc_common import data_dir, load_config, month_budget, month_label, plan_months, read_json, write_json  # noqa: E402
+from mc_common import data_dir, load_config, month_budget, month_label, plan_months, read_json, secure_tree, write_json  # noqa: E402
 
 NON_VARIABLE_GROUPS = {"Housing", "Debt", "Bills", "Income", "Transfers", "Fees"}
 
@@ -101,6 +101,7 @@ def main(argv=None):
     cfg = load_config(ddir)
     rows, findings = check(cfg)
     write_json(ddir / "findings" / "budget.json", {"agent": "budget", "months": rows, "findings": findings})
+    secure_tree(ddir)
     print(json.dumps({"months": [{"month": r["month"], "income": round(r["income"]), "buffer": round(r["buffer"]),
                                   "supported_savings_per_paycheck": round(r["savings_supported_per_paycheck"])} for r in rows],
                       "findings": [f["title"] for f in findings]}, indent=1))

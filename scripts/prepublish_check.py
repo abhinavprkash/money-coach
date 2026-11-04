@@ -39,7 +39,13 @@ def main():
     else:
         terms = [t.strip() for t in Path(sf).expanduser().read_text().splitlines() if t.strip() and not t.startswith("#")]
         hist = sh("git", "log", "--all", "-p", "--no-color").stdout.lower()
-        files_text = "\n".join((ROOT / f).read_text(encoding="utf-8", errors="ignore") for f in tracked if (ROOT / f).is_file()).lower()
+        texts, binaries = [], []
+        for f in tracked:
+            raw = (ROOT / f).read_bytes() if (ROOT / f).is_file() else b""
+            (binaries if b"\x00" in raw[:8192] else texts).append(raw.decode("utf-8", "ignore") if b"\x00" not in raw[:8192] else f)
+        files_text = "\n".join(texts).lower()
+        if binaries:   # random bytes give false matches; images need a human look instead
+            print(f"binary files to review visually ({len(binaries)}):", ", ".join(binaries))
         leaked = sorted({t for t in terms if t.lower() in files_text or t.lower() in hist})
         print(f"private terms ({len(terms)} checked):", "none found" if not leaked else f"FOUND {len(leaked)} (not printed)")
         ok &= not leaked

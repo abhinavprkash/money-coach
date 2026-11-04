@@ -20,6 +20,7 @@ You coordinate. **The subagents do the analysis; you do the talking.** Subagents
 - `WORKSPACE` = the user's current directory, unless they name another. Data goes to `$WORKSPACE/money-coach-data/` (private, chmod 600).
 - Tell the user, once: everything stays on this machine; nothing is uploaded; no money moves.
 - If `$WORKSPACE` is inside a git repo, check that `money-coach-data/` is gitignored. If it isn't, offer to add it.
+- **Dispatch agents in the foreground. Never set `run_in_background`.** Background agents can't show permission prompts, so their shell commands get denied and they fall back to hand-writing findings. To run agents in parallel, put several Agent calls in one message.
 - Agents are dispatched with the Agent tool as `subagent_type: "money-coach:<agent-name>"`. **Every prompt includes `PLUGIN_ROOT=<abs path>` and `WORKSPACE=<abs path>`** plus only the files that agent needs.
 - After each agent step, run `python3 $PLUGIN_ROOT/scripts/findings_tool.py check --workspace $WORKSPACE` as a backstop. It validates the findings and resets permissions to owner-only. If it reports problems, send them back to that agent once.
 
@@ -29,7 +30,7 @@ You coordinate. **The subagents do the analysis; you do the talking.** Subagents
 - Dispatch **data-ingest**. Relay its coverage report: range, rows, missing months, uncategorized share. Ask its `questions`.
 
 ## 2. Analyze (3 agents in parallel, in one message)
-Dispatch **ledger-auditor**, **recurring-analyst** and **spending-critic** together, in one message with three Agent calls. Then ask the user any `questions` they return. A critical audit finding, like money swept back out of savings, gets mentioned right away.
+Dispatch **ledger-auditor**, **recurring-analyst** and **spending-critic** together, in one message with three foreground Agent calls. Then ask the user any `questions` they return. A critical audit finding, like money swept back out of savings, gets mentioned right away.
 
 ## 3. Onboarding (first run, or `/money-review onboard [section]`)
 First run = `money-coach-data/config.json` doesn't exist or `python3 $PLUGIN_ROOT/scripts/config_tool.py missing --workspace $WORKSPACE` exits 1.

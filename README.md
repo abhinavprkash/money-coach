@@ -69,6 +69,16 @@ Nothing personal is hardcoded. Every number comes from your answers or your own 
 
 Independent agents run in parallel. The orchestrator skill (`/money-review`) does all the talking, because subagents can't ask you questions.
 
+## Permissions
+
+The subagents run the plugin's own Python and Node scripts. To avoid a prompt for every step, allow them once in `/permissions` (or `.claude/settings.json`):
+
+```json
+{ "permissions": { "allow": ["Bash(python3:*)", "Bash(node:*)"] } }
+```
+
+Narrow these to the plugin's install path if you prefer. Nothing the scripts do needs network access.
+
 ## Your data
 
 Everything lives in `./money-coach-data/` in the folder you ran it from (permissions `600`):

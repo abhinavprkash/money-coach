@@ -260,12 +260,61 @@ function goalView() {
   document.querySelectorAll("[data-w]").forEach(s => s.onchange = () => { (S.goal.windfalls[s.dataset.w] ||= {})[s.dataset.k] = s.value; save(); render(); });
 }
 
+// ---------- roast card: shareable PNG, made in the browser; nothing is uploaded ----------
+function maskMoney(text, mode) {
+  return String(text).replace(/\$[\d,]+(?:\.\d+)?(K|M)?/g, m => {
+    if (mode === "exact") return m;
+    if (mode === "hidden") return "$$$";
+    const v = parseFloat(m.replace(/[$,KM]/g, "")) * (m.endsWith("K") ? 1e3 : m.endsWith("M") ? 1e6 : 1);
+    if (v >= 1e3) return "~$" + (v / 1e3).toFixed(v >= 1e4 ? 0 : 1).replace(/\.0$/, "") + "K";
+    return "~$" + (v >= 100 ? Math.round(v / 10) * 10 : Math.round(v));
+  });
+}
+function roastLines() {
+  const rank = { critical: 0, serious: 1, warning: 2 };
+  return PLAN.findings.filter(f => ["spending", "recurring", "audit", "goal"].includes(f.agent) && rank[f.severity] !== undefined)
+    .sort((a, b) => rank[a.severity] - rank[b.severity] || b.amount_at_stake - a.amount_at_stake).slice(0, 3).map(f => f.title);
+}
+function wrap(ctx, text, maxW) {
+  const words = text.split(" "), lines = []; let cur = "";
+  words.forEach(w => { const t = cur ? cur + " " + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+  if (cur) lines.push(cur); return lines;
+}
+function drawRoastCard(mode) {
+  const c = $("rc-canvas"), ctx = c.getContext("2d"), W = 1200, H = 630;
+  c.width = W; c.height = H;
+  ctx.fillStyle = "#1f3864"; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#fff9db"; ctx.font = "bold 54px Arial"; ctx.fillText("My money, roasted 🔥", 64, 104);
+  ctx.font = "26px Arial"; ctx.fillStyle = "#c9d4ea"; ctx.fillText(`${PLAN.tone} mode · ${PLAN.months[0].label} – ${PLAN.months.at(-1).label}`, 64, 148);
+  let y = 230;
+  roastLines().forEach((t, i) => {
+    ctx.fillStyle = "#ff8a80"; ctx.font = "bold 40px Arial"; ctx.fillText(`${i + 1}.`, 64, y);
+    ctx.fillStyle = "#ffffff"; ctx.font = "34px Arial";
+    wrap(ctx, maskMoney(t, mode), W - 200).slice(0, 2).forEach((ln, j) => ctx.fillText(ln, 120, y + j * 44));
+    y += 120;
+  });
+  ctx.fillStyle = "#c9d4ea"; ctx.font = "22px Arial";
+  ctx.fillText("money-coach · a brutally honest money coach for Claude Code · runs 100% locally", 64, H - 40);
+}
+function roastCardUI() {
+  return `<div class="panel" style="margin-bottom:12px"><div class="sec">🔥 SHARE YOUR ROAST</div>
+    <p class="info">Your top 3 roasts as an image. Made in this browser, nothing uploaded. Amounts: <select id="rc-mode" style="width:auto">
+    <option value="rounded" selected>Rounded (~$2.3K)</option><option value="hidden">Hidden ($$$)</option><option value="exact">Exact</option></select>
+    <button class="btn" id="rc-dl">Download PNG</button></p><canvas id="rc-canvas" style="width:100%;max-width:600px;border-radius:6px"></canvas></div>`;
+}
+
 function flagsView() {
   const col = { critical: "#d03b3b", serious: "#ec835a", warning: "#fab219", verify: "#fab219", opp: "#0ca30c", good: "#0ca30c" };
   $("view").innerHTML = `<h1>Findings</h1><p class="sub">From each subagent: ingest, audit, recurring, spending, budget, goal, loan-vs-invest. Ranked by severity, then money at stake.</p>
+  ${roastLines().length ? roastCardUI() : ""}
   ${PLAN.findings.map(f => `<div class="flag"><span class="badge" style="border-color:${col[f.severity] || "#999"}">${esc(f.severity)}</span><b>${esc(f.title)}</b>
     <span class="info" style="float:right">${esc(f.agent)}${f.amount_at_stake ? ` · ${money(f.amount_at_stake)} at stake` : ""}</span>
     <ul class="info">${(f.evidence || []).map(e => `<li>${esc(e)}</li>`).join("")}</ul><div><b>Do:</b> ${esc(f.action)}</div></div>`).join("") || `<p class="info">No findings yet. Run /money-review.</p>`}`;
+  if ($("rc-canvas")) {
+    const paint = () => drawRoastCard($("rc-mode").value);
+    paint(); $("rc-mode").onchange = paint;
+    $("rc-dl").onclick = () => $("rc-canvas").toBlob(b => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "my-money-roast.png"; a.click(); });
+  }
 }
 
 /*__LVI_CODE__*/

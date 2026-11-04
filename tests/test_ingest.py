@@ -33,6 +33,13 @@ def test_profiles_detect_and_sign(tmp_path, profile):
     assert rows[0]["date"] == "2026-03-14"
 
 
+def test_generic_layout_not_mistaken_for_amex(tmp_path):
+    f = tmp_path / "savings.csv"
+    f.write_text("Date,Time,Amount,Type,Description\n2026-03-14,09:00:00,400.00,Deposit,ACME PAYROLL\n")
+    rows, name = read_file(f, categorize=CAT)
+    assert name == "auto" and rows[0]["amount"] == 400.0 and rows[0]["category"] == "Paycheck"
+
+
 def test_wells_noheader_and_generic(tmp_path):
     w = tmp_path / "wells.csv"
     w.write_text('"03/14/2026","-12.50","*","","CHIPOTLE 123"\n')

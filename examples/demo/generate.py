@@ -30,18 +30,23 @@ def month_iter():
             y, m = y + 1, 1
 
 
-checking, sapphire, amex = [], [], []   # (date, description, amount: negative = out)
+checking, sapphire, amex, ally, bills = [], [], [], [], []   # (date, description, amount: negative = out)
 
 for y, m in month_iter():
     pay1, pay2 = date(y, m, 15), (date(y, m + 1, 1) - timedelta(days=1)) if m < 12 else date(y, 12, 31)
-    for p in (pay1, pay2):
-        checking.append((p, "ACME CORP PAYROLL PPD ID: 000111", 2850.00))
-    checking.append((date(y, m, 1), "ONLINE PAYMENT TO SUNRISE APARTMENTS RENT", -1650.00))
-    checking.append((date(y, m, 5), "STUDENT LN NELNET PAYMENT", -420.00))
-    checking.append((date(y, m, 8), "CITYCU AUTO LOAN PAYMENT", -390.00))
-    checking.append((date(y, m, 12), "PG&E ELECTRIC WEB ONLINE", -round(rng.uniform(55, 110), 2)))
-    checking.append((date(y, m, 20), "VERIZON WIRELESS PAYMENTS", -65.00))
-    checking.append((date(y, m, 22), "GEICO AUTO INSURANCE", -142.00))
+    for p in (pay1, pay2):          # direct-deposit split: 1,050 checking / 400 savings / 1,400 bills
+        checking.append((p, "ACME CORP PAYROLL PPD ID: 000111", 1050.00))
+        ally.append((p, "ACME CORP PAYROLL", 400.00))
+        bills.append((p, "ACME CORP DES:PAYROLL", 1400.00))
+    # ...and the classic leak: most of the savings slice gets swept back to checking every month
+    ally.append((date(y, m, 27), "ONLINE TRANSFER TO CHASE CHECKING", -700.00))
+    checking.append((date(y, m, 27), "ONLINE TRANSFER FROM ALLY SAVINGS", 700.00))
+    bills.append((date(y, m, 1), "SUNRISE APARTMENTS RENT", -1650.00))
+    bills.append((date(y, m, 5), "STUDENT LN NELNET PAYMENT", -420.00))
+    bills.append((date(y, m, 8), "CITYCU AUTO LOAN PAYMENT", -390.00))
+    bills.append((date(y, m, 12), "PG&E ELECTRIC WEB ONLINE", -round(rng.uniform(55, 110), 2)))
+    bills.append((date(y, m, 22), "GEICO AUTO INSURANCE", -142.00))
+    sapphire.append((date(y, m, 20), "VERIZON WIRELESS PAYMENTS", -65.00))
     checking.append((date(y, m, 3), "ZELLE PAYMENT TO ROOMMATE UTILITIES", -round(rng.uniform(40, 70), 2)))
     # subscriptions on the Amex (price hike for one in month 5; a "cancelled" one that keeps charging)
     amex.append((date(y, m, 9), "NETFLIX.COM", -15.49))
@@ -105,4 +110,16 @@ with (OUT / "amex_gold.csv").open("w", newline="") as f:
     w.writerow(["Date", "Description", "Amount"])           # Amex: charges are POSITIVE
     for d, desc, a in sorted(amex):
         w.writerow([d.strftime("%m/%d/%Y"), desc, f"{-a:.2f}"])
+with (OUT / "ally_savings.csv").open("w", newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["Date", "Time", "Amount", "Type", "Description"])      # generic layout -> auto-detected
+    for d, desc, a in sorted(ally):
+        w.writerow([d.isoformat(), "09:00:00", f"{a:.2f}", "Deposit" if a > 0 else "Withdrawal", desc])
+with (OUT / "bills_checking.csv").open("w", newline="") as f:
+    w = csv.writer(f)
+    w.writerow(["Date", "Description", "Amount", "Running Bal."])        # Bank of America checking layout
+    bal = 400.0
+    for d, desc, a in sorted(bills):
+        bal += a
+        w.writerow([d.strftime("%m/%d/%Y"), desc, f"{a:.2f}", f"{bal:.2f}"])
 print("wrote", *sorted(p.name for p in OUT.glob("*.csv")))

@@ -25,7 +25,7 @@ PROFILES = {
                    "date": "transaction date", "desc": "description", "amount": "amount", "sign": 1, "institution": "Chase"},
     "chase_checking": {"match": {"details", "posting date", "description", "amount", "type", "balance"},
                        "date": "posting date", "desc": "description", "amount": "amount", "sign": 1, "institution": "Chase"},
-    "amex": {"match": {"date", "description", "amount"}, "exclude": {"debit", "credit", "running bal."},
+    "amex": {"match": {"date", "description", "amount"}, "exclude": {"debit", "credit", "running bal.", "time", "type", "balance", "status"},
              "date": "date", "desc": "description", "amount": "amount", "sign": -1, "institution": "American Express"},
     "capital_one": {"match": {"transaction date", "posted date", "description", "debit", "credit"},
                     "date": "transaction date", "desc": "description", "debit": "debit", "credit": "credit", "institution": "Capital One"},

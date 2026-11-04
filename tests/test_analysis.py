@@ -23,8 +23,9 @@ def test_spending_flags_trends_and_delivery(demo_ws):
     assert any("$" in v for v in roasts.values())
 
 
-def test_audit_p2p(demo_ws):
-    assert "P2P" in titles(demo_ws, "audit")
+def test_audit_p2p_and_savings_sweep(demo_ws):
+    t = titles(demo_ws, "audit")
+    assert "P2P" in t and "moved back OUT of savings" in t
 
 
 def test_roast_voices():

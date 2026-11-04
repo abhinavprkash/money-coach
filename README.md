@@ -7,13 +7,26 @@
 
 It roasts your Amazon habit with your own numbers. It never sees your passwords, and your data never leaves your machine.
 
-![Budget month](docs/img/budget-month.jpg)
+![money-coach demo](docs/img/demo.gif)
 
-| Findings, ranked by $ at stake | Loan vs Invest, with a red pen |
+## Try it in 10 seconds (fictional data, no AI calls)
+
+```sh
+git clone https://github.com/abhinavprkash/money-coach && cd money-coach
+python3 scripts/demo.py --open
+```
+
+Or, once the plugin is installed: `/money-review demo`. Jordan Demo is made up, but the leaks are real ones: a savings split swept back to checking every month, Amazon twice a week, a "cancelled" Hulu still billing.
+
+## Share your roast 🔥
+
+The Findings tab turns your top 3 roasts into an image you can post. It's made in your browser, nothing is uploaded, and amounts are rounded or hidden.
+
+<img src="docs/img/roast-card.png" width="560" alt="Roast card">
+
+| Monthly budget + tracker | Loan vs Invest, with a red pen |
 |---|---|
-| ![Findings](docs/img/findings.jpg) | ![Loan vs Invest](docs/img/loan-vs-invest.jpg) |
-
-*Screenshots use the fictional demo data in `examples/demo`.*
+| ![Budget month](docs/img/budget-month.jpg) | ![Loan vs Invest](docs/img/loan-vs-invest.jpg) |
 
 ## Install
 
@@ -30,6 +43,7 @@ Requires Python 3.9+ (with `openpyxl` for the Excel workbook) and Node, which Cl
 
 ```
 /money-review                    # full review: ingest → audit → onboarding → plan → goal → loans → dashboard
+/money-review demo               # same experience on fictional data
 /money-review onboard loans      # redo one onboarding section (income, split, bills, subscriptions, priorities, goal, loans, investments, taxes, tone)
 /money-dashboard                 # open the local dashboard (http://localhost:8765)
 /loan-vs-invest                  # just the "pay off loans or invest?" question
@@ -89,19 +103,6 @@ expenses.csv  settings.json  backups/  site/index.html  output/Budget.xlsx
 ```
 
 The dashboard server listens on `127.0.0.1` only and refuses requests from other sites. Every edit saves to `expenses.csv` / `settings.json`, with a daily backup. **Update Excel** rebuilds the workbook from those same files, so the site and the spreadsheet always match. See [PRIVACY.md](PRIVACY.md).
-
-## Try the demo (fictional data)
-
-```sh
-python3 examples/demo/generate.py
-mkdir -p /tmp/mc && for f in chase_checking chase_sapphire amex_gold; do
-  python3 scripts/ingest_csv.py examples/demo/bank/$f.csv --workspace /tmp/mc --append; done
-cp examples/demo/config.json /tmp/mc/money-coach-data/
-for c in summary audit recurring spending; do python3 scripts/analyze.py $c --workspace /tmp/mc; done
-python3 scripts/plan_budget.py caps --workspace /tmp/mc && python3 scripts/goal.py --workspace /tmp/mc
-node scripts/lvi_cli.js --workspace /tmp/mc --stress
-python3 app/build.py --workspace /tmp/mc && python3 app/server.py --workspace /tmp/mc --open
-```
 
 ## Develop
 

@@ -130,11 +130,13 @@ def audit(rows, a):
         out.append(finding("verify", f"{len(unmatched)} transfers have no matching other side in your files",
                            out_amt + in_amt, [f"Out ${out_amt:,.2f}, in ${in_amt:,.2f}", "Usually an account you didn't export (savings, brokerage, another bank)"],
                            "Export the missing accounts, or confirm these are moves between your own accounts."))
-    inv_keys = ("robinhood", "fidelity", "vanguard", "schwab", "brokerage", "etrade", "webull", "acorns", "betterment", "wealthfront")
-    pulled = [r for r in rows if r["amount"] > 0 and r["kind"] == "transfer" and any(k in r["description"].lower() for k in inv_keys)]
+    sweep_keys = ("robinhood", "fidelity", "vanguard", "schwab", "brokerage", "etrade", "webull", "acorns", "betterment",
+                  "wealthfront", "savings", "ally", "marcus", "sofi", "high yield")
+    pulled = [r for r in rows if r["amount"] > 0 and r["kind"] == "transfer" and "savings" not in r["account"].lower()
+              and any(k in r["description"].lower() for k in sweep_keys)]
     if len(pulled) >= 3:
         tot = sum(r["amount"] for r in pulled)
-        out.append(finding("critical", f"${tot:,.0f} moved back OUT of investment accounts ({len(pulled)} transfers)",
+        out.append(finding("critical", f"${tot:,.0f} moved back OUT of savings/investments ({len(pulled)} transfers)",
                            tot, [f"{r['date']} {r['description'][:40]} ${r['amount']:,.2f}" for r in pulled[-5:]],
                            "If this is a paycheck split you sweep back each month, your savings never accumulate. Change the split instead of withdrawing.",
                            lever="split"))

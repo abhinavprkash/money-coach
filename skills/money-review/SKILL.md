@@ -24,6 +24,10 @@ You coordinate. **The subagents do the analysis; you do the talking.** Subagents
 - Agents are dispatched with the Agent tool as `subagent_type: "money-coach:<agent-name>"`. **Every prompt includes `PLUGIN_ROOT=<abs path>` and `WORKSPACE=<abs path>`** plus only the files that agent needs.
 - After each agent step, run `python3 $PLUGIN_ROOT/scripts/findings_tool.py check --workspace $WORKSPACE` as a backstop. It validates the findings and resets permissions to owner-only. If it reports problems, send them back to that agent once.
 
+## Demo mode (`/money-review demo`)
+Run `python3 $PLUGIN_ROOT/scripts/demo.py --workspace $WORKSPACE/money-coach-demo`. It builds everything from fictional data in seconds, with no agents. Then start the dashboard as in /money-dashboard, with `--workspace $WORKSPACE/money-coach-demo`.
+Walk the user through the top findings, the roast card on the Findings tab, and Loan vs Invest. Then offer the real thing: export 12 months of CSVs into `statements/` and run `/money-review`.
+
 ## 1. Ingest (agent: data-ingest)
 - Ask where the statements are if no path was given. Suggest exporting 12 months of CSVs from each bank/card into `$WORKSPACE/statements/`.
 - If Cashflow MCP tools are available, ask whether to use them (read-only) in addition to CSVs.

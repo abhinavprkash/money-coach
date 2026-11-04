@@ -11,6 +11,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "app"))
 PY = sys.executable
 DEMO = ROOT / "examples" / "demo"
+DEMO_ACCOUNTS = (("chase_checking", "Chase Checking"), ("ally_savings", "Ally Savings"), ("bills_checking", "Bills Checking"),
+                 ("chase_sapphire", "Chase Sapphire"), ("amex_gold", "Amex Gold"))
 
 
 def run(*args, cwd=ROOT):
@@ -21,7 +23,7 @@ def run(*args, cwd=ROOT):
 def demo_ws(tmp_path_factory):
     """A fully processed demo workspace: ingest -> analyze -> onboarding config -> plan -> goal -> lvi -> build."""
     ws = tmp_path_factory.mktemp("demo")
-    for f, acct in (("chase_checking", "Chase Checking"), ("chase_sapphire", "Chase Sapphire"), ("amex_gold", "Amex Gold")):
+    for f, acct in DEMO_ACCOUNTS:
         run(ROOT / "scripts/ingest_csv.py", DEMO / "bank" / f"{f}.csv", "--account", acct, "--workspace", ws, "--append")
     run(ROOT / "scripts/analyze.py", "summary", "--workspace", ws)
     shutil.copy(DEMO / "config.json", ws / "money-coach-data" / "config.json")
